@@ -318,6 +318,63 @@ export default function App() {
   );
 }
 
+function PositiveNumberInput({
+  value,
+  min = 1,
+  max,
+  className,
+  onValidChange,
+}: {
+  value: number;
+  min?: number;
+  max?: number;
+  className?: string;
+  onValidChange: (value: number) => void;
+}) {
+  const [draft, setDraft] = useState(String(value));
+
+  useEffect(() => {
+    setDraft(String(value));
+  }, [value]);
+
+  function commit(raw: string) {
+    setDraft(raw);
+
+    if (raw === "") {
+      return;
+    }
+
+    const next = Number(raw);
+    if (!isAllowedNumber(next, min, max)) {
+      return;
+    }
+
+    onValidChange(next);
+  }
+
+  return (
+    <input
+      className={className}
+      type="number"
+      inputMode="numeric"
+      min={min}
+      max={max}
+      value={draft}
+      onChange={(event) => commit(event.target.value)}
+      onBlur={() => {
+        const next = Number(draft);
+        if (draft === "" || !isAllowedNumber(next, min, max)) {
+          setDraft(String(value));
+        }
+      }}
+    />
+  );
+}
+
+function isAllowedNumber(value: number, min: number, max?: number) {
+  return Number.isInteger(value) && value >= min && (max === undefined || value <= max);
+}
+
 function TeamSetup({
   config,
   players,
@@ -469,14 +526,12 @@ function TeamSetup({
                 {count}
               </button>
             ))}
-            <input
+            <PositiveNumberInput
               className="small-number"
-              type="number"
               min={1}
               max={30}
               value={config.perTeamCount}
-              onChange={(event) => {
-                const next = Number(event.target.value) || 1;
+              onValidChange={(next) => {
                 updateConfig({
                   perTeamCount: next,
                   formationSlots: rebalanceFormation(config.formationSlots, next),
@@ -509,14 +564,11 @@ function TeamSetup({
         {config.playerMode === "number" ? (
           <label className="field">
             <span>生成号码数量</span>
-            <input
-              type="number"
+            <PositiveNumberInput
               min={1}
               max={300}
               value={config.numberPlayerCount}
-              onChange={(event) =>
-                updateConfig({ numberPlayerCount: Number(event.target.value) || 1 })
-              }
+              onValidChange={(next) => updateConfig({ numberPlayerCount: next })}
             />
           </label>
         ) : (
@@ -614,14 +666,13 @@ function FormationSetup({
               />
               <label>
                 人数
-                <input
-                  type="number"
+                <PositiveNumberInput
                   min={1}
                   max={20}
                   value={slot.count}
-                  onChange={(event) =>
+                  onValidChange={(next) =>
                     updateSlot(config, updateConfig, slot.id, {
-                      count: Number(event.target.value) || 1,
+                      count: next,
                     })
                   }
                 />
@@ -645,12 +696,11 @@ function FormationSetup({
         <div className="random-options">
           <label className="field">
             <span>随机次数</span>
-            <input
-              type="number"
+            <PositiveNumberInput
               min={1}
               max={20}
               value={config.randomRounds}
-              onChange={(event) => updateConfig({ randomRounds: Number(event.target.value) || 1 })}
+              onValidChange={(next) => updateConfig({ randomRounds: next })}
             />
           </label>
           <div className="validation-list">
