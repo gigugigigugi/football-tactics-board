@@ -227,7 +227,7 @@ export default function App() {
             <Lock size={24} />
           </div>
           <p className="eyebrow">Invite Only</p>
-          <h1>足球随机分队</h1>
+          <h1>足球位置随机器</h1>
           <label className="field">
             <span>邀请码</span>
             <input
@@ -252,7 +252,7 @@ export default function App() {
       <header className="topbar">
         <div>
           <p className="eyebrow">Web Crypto Randomizer</p>
-          <h1>足球随机分队</h1>
+          <h1>足球位置随机器</h1>
         </div>
         <nav className="step-tabs" aria-label="流程">
           <button className={step === "teams" ? "active" : ""} onClick={() => setStep("teams")}>
@@ -626,37 +626,6 @@ function FormationSetup({
                   }
                 />
               </label>
-              <details className="position-tune">
-                <summary>站位微调</summary>
-                <label>
-                  左右
-                  <input
-                    type="range"
-                    min={10}
-                    max={90}
-                    value={slot.defaultX}
-                    onChange={(event) =>
-                      updateSlot(config, updateConfig, slot.id, {
-                        defaultX: Number(event.target.value),
-                      })
-                    }
-                  />
-                </label>
-                <label>
-                  前后
-                  <input
-                    type="range"
-                    min={10}
-                    max={90}
-                    value={slot.defaultY}
-                    onChange={(event) =>
-                      updateSlot(config, updateConfig, slot.id, {
-                        defaultY: Number(event.target.value),
-                      })
-                    }
-                  />
-                </label>
-              </details>
               <button
                 className="icon-button danger"
                 title="删除位置"
@@ -905,7 +874,7 @@ function TacticalBoard({
       </section>
 
       <section className="panel board-details">
-        <div className="detail-block">
+        <div className="detail-block goal-block">
           <h2>进球</h2>
           <div className="goal-form">
             <input
@@ -937,7 +906,7 @@ function TacticalBoard({
           </div>
         </div>
 
-        <details className="detail-block collapsible">
+        <details className="detail-block collapsible roster-block">
           <summary>名单</summary>
           <div className="roster-list">
             {starters.map((assignment, index) => {
@@ -972,7 +941,7 @@ function TacticalBoard({
           </div>
         </details>
 
-        <div className="detail-block">
+        <div className="detail-block bench-block">
           <h2>替补</h2>
           <div className="bench-list">
             {bench.length ? (
@@ -987,8 +956,8 @@ function TacticalBoard({
           </div>
         </div>
 
-        <div className="detail-block">
-          <h2>记录</h2>
+        <div className="detail-block events-block">
+          <h2>进球记录</h2>
           <div className="event-list">
             {result.events.length ? (
               result.events.map((event) => {

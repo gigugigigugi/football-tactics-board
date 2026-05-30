@@ -1,7 +1,7 @@
 {
-  "name": "足球随机分队战术板",
-  "short_name": "足球战术板",
-  "description": "手机可用的足球随机分队与战术板工具。",
+  "name": "足球位置随机战术板",
+  "short_name": "位置战术板",
+  "description": "手机可用的足球位置随机与战术板工具。",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

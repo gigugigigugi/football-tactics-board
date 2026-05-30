@@ -57,6 +57,10 @@ button:disabled {
   padding: 24px;
 }
 
+.login-card .primary-button {
+  margin-top: 12px;
+}
+
 .lock-mark {
   display: grid;
   width: 48px;
@@ -312,7 +316,7 @@ input[type="range"] {
 
 .formation-card {
   display: grid;
-  grid-template-columns: minmax(150px, 1fr) 90px minmax(120px, auto) 42px;
+  grid-template-columns: minmax(150px, 1fr) 90px 42px;
   gap: 8px;
   align-items: end;
   border: 1px solid rgba(198, 255, 51, 0.1);
@@ -567,7 +571,7 @@ input[type="range"] {
       16.66% 100%,
     radial-gradient(circle at 50% 50%, rgba(201, 255, 49, 0.16), transparent 26%),
     linear-gradient(180deg, #1d6f38, #134e2d);
-  touch-action: none;
+  touch-action: pan-y;
   box-shadow:
     inset 0 0 0 1px rgba(201, 255, 49, 0.16),
     inset 0 0 48px rgba(0, 0, 0, 0.24);
@@ -864,16 +868,44 @@ input[type="range"] {
     grid-template-columns: 1fr 92px 42px;
   }
 
-  .position-tune {
-    grid-column: 1 / -1;
-  }
-
   .board-flow {
     grid-template-columns: 1fr;
   }
 
+  .compact-panel {
+    order: 1;
+  }
+
+  .board-details {
+    order: 2;
+  }
+
+  .single-board {
+    order: 3;
+  }
+
   .board-details {
     position: static;
+  }
+
+  .roster-block {
+    order: 1;
+  }
+
+  .goal-block {
+    order: 2;
+  }
+
+  .events-block {
+    order: 3;
+  }
+
+  .bench-block {
+    order: 4;
+  }
+
+  .board-details > .soft-button {
+    order: 5;
   }
 
   .pitch {
