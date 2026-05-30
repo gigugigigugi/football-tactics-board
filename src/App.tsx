@@ -906,7 +906,7 @@ function TacticalBoard({
           </div>
         </div>
 
-        <details className="detail-block collapsible roster-block">
+        <details className="detail-block collapsible roster-block" open>
           <summary>名单</summary>
           <div className="roster-list">
             {starters.map((assignment, index) => {
