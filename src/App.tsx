@@ -318,7 +318,7 @@ export default function App() {
   );
 }
 
-function PositiveNumberInput({
+function NumberSelect({
   value,
   min = 1,
   max,
@@ -327,52 +327,28 @@ function PositiveNumberInput({
 }: {
   value: number;
   min?: number;
-  max?: number;
+  max: number;
   className?: string;
   onValidChange: (value: number) => void;
 }) {
-  const [draft, setDraft] = useState(String(value));
-
-  useEffect(() => {
-    setDraft(String(value));
-  }, [value]);
-
-  function commit(raw: string) {
-    setDraft(raw);
-
-    if (raw === "") {
-      return;
-    }
-
-    const next = Number(raw);
-    if (!isAllowedNumber(next, min, max)) {
-      return;
-    }
-
-    onValidChange(next);
-  }
+  const options = useMemo(
+    () => Array.from({ length: max - min + 1 }, (_, index) => min + index),
+    [max, min],
+  );
 
   return (
-    <input
+    <select
       className={className}
-      type="number"
-      inputMode="numeric"
-      min={min}
-      max={max}
-      value={draft}
-      onChange={(event) => commit(event.target.value)}
-      onBlur={() => {
-        const next = Number(draft);
-        if (draft === "" || !isAllowedNumber(next, min, max)) {
-          setDraft(String(value));
-        }
-      }}
-    />
+      value={value}
+      onChange={(event) => onValidChange(Number(event.target.value))}
+    >
+      {options.map((option) => (
+        <option key={option} value={option}>
+          {option}
+        </option>
+      ))}
+    </select>
   );
-}
-
-function isAllowedNumber(value: number, min: number, max?: number) {
-  return Number.isInteger(value) && value >= min && (max === undefined || value <= max);
 }
 
 function TeamSetup({
@@ -526,7 +502,7 @@ function TeamSetup({
                 {count}
               </button>
             ))}
-            <PositiveNumberInput
+            <NumberSelect
               className="small-number"
               min={1}
               max={30}
@@ -564,7 +540,7 @@ function TeamSetup({
         {config.playerMode === "number" ? (
           <label className="field">
             <span>生成号码数量</span>
-            <PositiveNumberInput
+            <NumberSelect
               min={1}
               max={300}
               value={config.numberPlayerCount}
@@ -666,7 +642,7 @@ function FormationSetup({
               />
               <label>
                 人数
-                <PositiveNumberInput
+                <NumberSelect
                   min={1}
                   max={20}
                   value={slot.count}
@@ -696,7 +672,7 @@ function FormationSetup({
         <div className="random-options">
           <label className="field">
             <span>随机次数</span>
-            <PositiveNumberInput
+            <NumberSelect
               min={1}
               max={20}
               value={config.randomRounds}
