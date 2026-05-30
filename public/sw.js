@@ -9,7 +9,8 @@ const APP_SHELL = [
   "/pwa-icon-192.png",
   "/pwa-icon-512.png",
   "/pwa-icon.svg",
-  "/manifest.webmanifest"
+  "/manifest.webmanifest",
+  "/robots.txt"
 ];
 
 self.addEventListener("install", (event) => {
