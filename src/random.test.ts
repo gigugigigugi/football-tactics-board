@@ -99,4 +99,31 @@ describe("randomizeTeams", () => {
 
     expect(validation.ok).toBe(false);
   });
+
+  it("keeps pinned players in their locked slot", () => {
+    const result = randomizeTeams({
+      teams: teams.slice(0, 1),
+      perTeamCount: 2,
+      players,
+      formationSlots: slots,
+      pinnedAssignments: [
+        {
+          playerId: "p1",
+          teamId: "red",
+          slotId: "df",
+          slotIndex: 1,
+        },
+      ],
+      randomRounds: 1,
+    });
+
+    expect(result.assignments).toContainEqual(
+      expect.objectContaining({
+        playerId: "p1",
+        teamId: "red",
+        slotId: "df",
+        slotIndex: 1,
+      }),
+    );
+  });
 });

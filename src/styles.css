@@ -325,13 +325,27 @@ input[type="range"] {
   padding: 10px;
 }
 
+.slot-locks {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 8px;
+}
+
 .formation-card label,
-.position-tune summary {
+.position-tune summary,
+.slot-lock-row {
   display: grid;
   gap: 5px;
   color: #aeb9b0;
   font-size: 0.86rem;
   font-weight: 800;
+}
+
+.slot-lock-row span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .position-tune {

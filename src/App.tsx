@@ -174,7 +174,7 @@ export default function App() {
         perTeamCount: config.perTeamCount,
         players,
         formationSlots: config.formationSlots,
-        pinnedAssignments: [],
+        pinnedAssignments: config.pinnedAssignments,
         randomRounds: config.randomRounds,
       }),
     [config, players],
@@ -184,8 +184,16 @@ export default function App() {
   useEffect(() => saveSessionJson(CONFIG_KEY, config), [config]);
   useEffect(() => saveSessionJson(RESULT_KEY, result), [result]);
 
-  function updateConfig(patch: Partial<MatchConfig>) {
-    setConfig((current) => ({ ...current, ...patch, pinnedAssignments: [] }));
+  function updateConfig(patch: Partial<MatchConfig>, options: { resetPins?: boolean } = {}) {
+    setConfig((current) => {
+      const next = { ...current, ...patch };
+
+      if (options.resetPins === false || "pinnedAssignments" in patch) {
+        return next;
+      }
+
+      return { ...next, pinnedAssignments: [] };
+    });
   }
 
   function handleInviteSubmit(event: FormEvent) {
@@ -205,7 +213,7 @@ export default function App() {
         perTeamCount: config.perTeamCount,
         players,
         formationSlots: config.formationSlots,
-        pinnedAssignments: [],
+        pinnedAssignments: config.pinnedAssignments,
         randomRounds: config.randomRounds,
       });
       setResult(next);
@@ -298,6 +306,7 @@ export default function App() {
       {step === "formation" && (
         <FormationSetup
           config={config}
+          players={players}
           validationErrors={validation.errors}
           updateConfig={updateConfig}
           onBack={() => setStep("teams")}
@@ -335,11 +344,20 @@ function NumberSelect({
     () => Array.from({ length: max - min + 1 }, (_, index) => min + index),
     [max, min],
   );
+  const normalizedValue = options.includes(value)
+    ? value
+    : Math.trunc(clamp(value, min, max));
+
+  useEffect(() => {
+    if (normalizedValue !== value) {
+      onValidChange(normalizedValue);
+    }
+  }, [normalizedValue, onValidChange, value]);
 
   return (
     <select
       className={className}
-      value={value}
+      value={normalizedValue}
       onChange={(event) => onValidChange(Number(event.target.value))}
     >
       {options.map((option) => (
@@ -587,18 +605,21 @@ function TeamSetup({
 
 function FormationSetup({
   config,
+  players,
   validationErrors,
   updateConfig,
   onBack,
   onRandomize,
 }: {
   config: MatchConfig;
+  players: Player[];
   validationErrors: string[];
-  updateConfig: (patch: Partial<MatchConfig>) => void;
+  updateConfig: (patch: Partial<MatchConfig>, options?: { resetPins?: boolean }) => void;
   onBack: () => void;
   onRandomize: () => void;
 }) {
   const formationTotal = config.formationSlots.reduce((sum, slot) => sum + slot.count, 0);
+  const teamId = config.teams[0]?.id ?? "";
 
   return (
     <div className="mobile-flow">
@@ -667,6 +688,46 @@ function FormationSetup({
               >
                 <Trash2 size={17} />
               </button>
+              <div className="slot-locks">
+                {Array.from({ length: slot.count }, (_, index) => {
+                  const slotIndex = index + 1;
+                  const pin = config.pinnedAssignments.find(
+                    (item) =>
+                      item.teamId === teamId &&
+                      item.slotId === slot.id &&
+                      item.slotIndex === slotIndex,
+                  );
+
+                  return (
+                    <label className="slot-lock-row" key={`${slot.id}-${slotIndex}`}>
+                      <span>
+                        <Lock size={14} />
+                        锁定 #{slotIndex}
+                      </span>
+                      <select
+                        value={pin?.playerId ?? ""}
+                        onChange={(event) =>
+                          updatePinnedAssignment(
+                            config,
+                            updateConfig,
+                            teamId,
+                            slot.id,
+                            slotIndex,
+                            event.target.value,
+                          )
+                        }
+                      >
+                        <option value="">随机</option>
+                        {players.map((player) => (
+                          <option key={player.id} value={player.id}>
+                            {player.number ?? player.label} {player.label !== player.number ? player.label : ""}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  );
+                })}
+              </div>
             </div>
           ))}
         </div>
@@ -1113,6 +1174,28 @@ function updateSlot(
       slot.id === slotId ? { ...slot, ...patch } : slot,
     ),
   });
+}
+
+function updatePinnedAssignment(
+  config: MatchConfig,
+  updateConfig: (patch: Partial<MatchConfig>, options?: { resetPins?: boolean }) => void,
+  teamId: string,
+  slotId: string,
+  slotIndex: number,
+  playerId: string,
+) {
+  const withoutCurrentTarget = config.pinnedAssignments.filter(
+    (pin) => !(pin.teamId === teamId && pin.slotId === slotId && pin.slotIndex === slotIndex),
+  );
+
+  updateConfig(
+    {
+      pinnedAssignments: playerId
+        ? [...withoutCurrentTarget, { playerId, teamId, slotId, slotIndex }]
+        : withoutCurrentTarget,
+    },
+    { resetPins: false },
+  );
 }
 
 function defaultPositionForAssignment(
