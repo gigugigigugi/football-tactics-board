@@ -129,7 +129,7 @@ const DEFAULT_CONFIG: MatchConfig = {
   namesText: "阿明\n小林\n健太\nLeo\n翔太\n小王",
   formationSlots: presetFormation(6),
   pinnedAssignments: [],
-  randomRounds: 1,
+  randomRounds: 3,
 };
 
 type Step = "teams" | "formation" | "board";
@@ -495,6 +495,7 @@ function TeamSetup({
                 onClick={() =>
                   updateConfig({
                     perTeamCount: count,
+                    numberPlayerCount: count,
                     formationSlots: presetFormation(count),
                   })
                 }
@@ -505,11 +506,12 @@ function TeamSetup({
             <NumberSelect
               className="small-number"
               min={1}
-              max={30}
+              max={15}
               value={config.perTeamCount}
               onValidChange={(next) => {
                 updateConfig({
                   perTeamCount: next,
+                  numberPlayerCount: next,
                   formationSlots: rebalanceFormation(config.formationSlots, next),
                 });
               }}
@@ -540,12 +542,12 @@ function TeamSetup({
         {config.playerMode === "number" ? (
           <label className="field">
             <span>生成号码数量</span>
-            <NumberSelect
-              min={1}
-              max={300}
-              value={config.numberPlayerCount}
-              onValidChange={(next) => updateConfig({ numberPlayerCount: next })}
-            />
+              <NumberSelect
+                min={1}
+                max={15}
+                value={config.numberPlayerCount}
+                onValidChange={(next) => updateConfig({ numberPlayerCount: next })}
+              />
           </label>
         ) : (
           <label className="field">
@@ -644,7 +646,7 @@ function FormationSetup({
                 人数
                 <NumberSelect
                   min={1}
-                  max={20}
+                  max={5}
                   value={slot.count}
                   onValidChange={(next) =>
                     updateSlot(config, updateConfig, slot.id, {
@@ -672,10 +674,10 @@ function FormationSetup({
         <div className="random-options">
           <label className="field">
             <span>随机次数</span>
-            <NumberSelect
-              min={1}
-              max={20}
-              value={config.randomRounds}
+              <NumberSelect
+                min={1}
+                max={5}
+                value={config.randomRounds}
               onValidChange={(next) => updateConfig({ randomRounds: next })}
             />
           </label>
